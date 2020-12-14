@@ -98,6 +98,12 @@ EOF
 }
 
 ### Main ####
+service wazuh-manager stop
+service wazuh-api stop
+service kibana stop 
+service elasticsearch stop
+service filebeat stop
+
 docker rmi $(docker images | grep "none" | awk '/ / { print $3 }')
 preInstall
 WazuhInstall
@@ -110,4 +116,3 @@ service logstash restart
 IP1=$(curl ifconfig.me)
 banner3 "Ambiente instalado"  "Conectese a $IP1/icingaweb2"
 banner3 "USUARIO icingaadmin" "CONTRASEÑA: icinga"
-

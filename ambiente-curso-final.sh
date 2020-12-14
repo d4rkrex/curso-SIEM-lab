@@ -103,7 +103,7 @@ service wazuh-api stop
 service kibana stop 
 service elasticsearch stop
 service filebeat stop
-
+docker stop misp
 docker rmi $(docker images | grep "none" | awk '/ / { print $3 }')
 preInstall
 WazuhInstall

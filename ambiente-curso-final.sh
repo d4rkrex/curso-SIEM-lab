@@ -23,7 +23,7 @@ function beatsInstall()
 
 curl -s https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee /etc/apt/sources.list.d/elastic-7.x.list
-apt-get update && apt-get install filebeat logstash
+apt-get update && apt-get install -y filebeat logstash
 
 }
 
@@ -32,8 +32,16 @@ function icingaInstall()
 git clone https://github.com/jjethwa/icinga2.git /opt/icinga2
 chmod 777 /opt/icinga2
 cd /opt/icinga2
-echo "MYSQL_ROOT_PASSWORD=<password>" > secrets_sql.env
-docker-compose up
+###  credentials below must be changed!!!
+echo "MYSQL_ROOT_PASSWORD=Curso123" > secrets_sql.env
+echo "DEFAULT_MYSQL_PASS=Curso123" >> secrets_sql.env
+docker-compose up -d
+ln -s /opt/icinga2/data/icinga/etc/icinga2/ /etc/icinga2
+ln -s /opt/icinga2/data/icinga/etc/icingaweb2/ /etc/icingaweb2
+echo 'alias sc="docker exec -it icinga2_icinga2_1"' >> /root/.bashrc
+echo 'alias sql="docker exec -it mysql mysql"' >> /root/.bashrc
+source /root/.bashrc
+
 }
 
 function preInstall()
@@ -89,18 +97,17 @@ EOF
 
 }
 
-#
-
 ### Main ####
+docker rmi $(docker images | grep "none" | awk '/ / { print $3 }')
 preInstall
 WazuhInstall
-IncingaInstall
+icingaInstall
 beatsInstall
 configureBeats
 
 service filebeat restart  
 service logstash restart  
 IP1=$(curl ifconfig.me)
-banner3 "Ambiente instalado  conectese a $IP1/icingaweb2"
+banner3 "Ambiente instalado"  "Conectese a $IP1/icingaweb2"
 banner3 "USUARIO icingaadmin" "CONTRASEÑA: icinga"
 
